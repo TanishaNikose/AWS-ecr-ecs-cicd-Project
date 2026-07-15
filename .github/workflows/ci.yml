@@ -1,4 +1,4 @@
-name: CI Pipeline - Build and Push Docker Image to Amazon ECR
+name: CI/CD Pipeline - Build, Push and Deploy to ECS
 
 on:
   push:
@@ -6,47 +6,63 @@ on:
       - main
 
 jobs:
-  docker-build-push:
+  deploy:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      # Step 1: Checkout Repository
+      # Checkout Repository
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # Step 2: Configure AWS Credentials
+      # Configure AWS Credentials
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4cz
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Login to Amazon ECR
+      # Login to Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 4: Build Docker Image
+      # Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
 
-      # Step 5: Tag Docker Image
+      # Tag Docker Image
       - name: Tag Docker Image
         run: |
           docker tag ${{ secrets.ECR_REPOSITORY }}:latest \
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-      # Step 6: Push Docker Image to Amazon ECR
+      # Push Docker Image
       - name: Push Docker Image
         run: |
           docker push \
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-      # Step 7: Success Message
-      - name: Pipeline Completed
-        run: |
-          echo "Docker Image Successfully Pushed to Amazon ECR 🚀"
+      # Update Task Definition
+      - name: Fill in new Image ID
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+          container-name: aws-ecr-container
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+
+      # Deploy to ECS
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Deployment Successful
+        run: echo "Application successfully deployed to Amazon ECS 🚀"
