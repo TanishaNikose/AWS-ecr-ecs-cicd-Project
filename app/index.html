@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS ECS CI/CD Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🚀 AWS ECS CI/CD Pipeline</h1>
+        <p>Automated Deployment using GitHub Actions, Docker, Amazon ECR & ECS</p>
+    </header>
+
+    <main>
+
+        <section class="card">
+            <h2>Project Overview</h2>
+
+            <p>
+                This application demonstrates an end-to-end CI/CD pipeline
+                deployed on Amazon ECS using Docker containers.
+            </p>
+        </section>
+
+        <section class="card">
+
+            <h2>Pipeline Flow</h2>
+
+            <div class="pipeline">
+
+                <div>Developer</div>
+                <span>➜</span>
+
+                <div>GitHub</div>
+                <span>➜</span>
+
+                <div>GitHub Actions</div>
+                <span>➜</span>
+
+                <div>Docker</div>
+                <span>➜</span>
+
+                <div>Amazon ECR</div>
+                <span>➜</span>
+
+                <div>Amazon ECS</div>
+
+            </div>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Technologies Used</h2>
+
+            <ul>
+
+                <li>Docker</li>
+
+                <li>GitHub Actions</li>
+
+                <li>Amazon ECR</li>
+
+                <li>Amazon ECS</li>
+
+                <li>HTML</li>
+
+                <li>CSS</li>
+
+                <li>JavaScript</li>
+
+            </ul>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Deployment Status</h2>
+
+            <div class="status">
+
+                <span class="dot"></span>
+
+                Running Successfully
+
+            </div>
+
+            <button onclick="showMessage()">
+                Check Deployment
+            </button>
+
+            <p id="result"></p>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        Built by Tanisha ❤️ | AWS DevOps Portfolio Project
+
+    </footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
